@@ -87,10 +87,41 @@ UsuariosModel.updateOne({nombreUsuario:"pascu"},{$push:{follow:["604a4b613b949f2
 UsuariosModel.updateOne({nombreUsuario:"rodri"},{$push:{follow:["604a4b613b949f2ab82b88d1","604a4b613b949f2ab82b88ce"]}},check)
 UsuariosModel.updateOne({nombreUsuario:"hurti"},{$push:{follow:["604a4b613b949f2ab82b88d1","604a4b613b949f2ab82b88ce"]}},check)
 
+function timeLine(nombreUsuario){
+    UsuariosModel.findOne({nombreUsuario:nombreUsuario})
+    .populate({
+        path : 'follow',
+        populate : {
+          path : 'imagenes'
+        }
+      })
+    .exec((err,usuarios) =>
+    {
+        if(err){
+            console.log(err)
+            process.exit(-1)
+        }else{
+            
+            for (let i = 0; i < usuarios.follow.length; i++) {
+                for (let j = 0; j < usuarios.follow[i].imagenes.length; j++) {
+                    console.log(usuarios.follow[i].imagenes[j])
+                    
+                }
+                
+            }
+    
+        }
+    })
+    
+
+}
+
+timeLine("pascu")
+
 app.get("/",
     
     function(req,res){
-        let respuesta;
+        let respuesta=[];
 UsuariosModel.findOne({nombreUsuario:"pascu"})
 .populate({
     path : 'follow',
@@ -107,15 +138,16 @@ UsuariosModel.findOne({nombreUsuario:"pascu"})
         
         for (let i = 0; i < usuarios.follow.length; i++) {
             for (let j = 0; j < usuarios.follow[i].imagenes.length; j++) {
-                res.send(usuarios.follow[i].imagenes[j])
+                respuesta.push(usuarios.follow[i].imagenes[j])
                 
             }
-            
+            res.send(respuesta)
         }
+
     }
 })
 
-    })
+})
 
 
 
